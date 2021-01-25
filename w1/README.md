@@ -12,7 +12,6 @@ Links:
 
 - C standard lib reference: [https://en.cppreference.com/w/c](https://en.cppreference.com/w/c)
 - My GDB commands reference: [https://www.josehu.com/assets/file/gdb-usage.pdf](https://www.josehu.com/assets/file/gdb-usage.pdf)
-- 
 
 ## Example C Code
 
