@@ -14,7 +14,7 @@ Topics:
 Links:
 
 - GNU Make official manual: [https://www.gnu.org/software/make/manual/](https://www.gnu.org/software/make/manual/)
-- xv6 MIT public release: [https://github.com/mit-pdos/xv6-public](https://github.com/mit-pdos/xv6-public)
+- xv6 MIT public release - x86 version: [https://github.com/mit-pdos/xv6-public](https://github.com/mit-pdos/xv6-public)
     - Please use our mirrored archive at `~cs537-1/projects/xv6.tar.gz` as your project codebase
 - QEMU official website: [https://www.qemu.org/](https://www.qemu.org/)
 
@@ -22,7 +22,7 @@ Links:
 
 GNU Make is a tool that automates the building process of your project.
 
-It takes a `Makefile` of specific syntax to figure out how you wanna build your code. In the Makefile, you specify *targets*, the dependencies of each target, and the commands to run to build each target.
+It takes a `Makefile` of specific syntax to figure out how you wanna build your code. In the Makefile, you specify *targets*, the *dependencies* of each target, and the commands to run to build each target.
 
 ```bash
 target: dependencies
@@ -37,15 +37,15 @@ $ make [target_name]    # If no target given, defaults to the first target met
                         # So, we typically use an `all` target at the top
 ```
 
-> Note: Makefile is sensitive to tabs vs. spaces. It requires commands to be indented with ONE TAB.
+> Note: Makefile is sensitive to tabs vs. spaces. It requires commands to be indented with exactly ONE TAB.
 
 > You may also be interested in `CMake`, a higher-level building tool that "generates" Makefiles for you. You may see use cases in larger, more complex projects.
 
 ## Introduction to xv6
 
-xv6 is a simple operating system for teaching purposes, initially released by the MIT PDOS group. The OSTEP book uses xv6 for its projects.
+xv6 is a simple operating system for teaching purposes, initially released by the MIT PDOS group. The OSTEP book uses the x86 version of xv6 for its projects.
 
-To run it we need an emulator to emulate a hardware platform for us (a "fake" machine) and then boot xv6 on that emulator. System developers typically use QEMU. QEMU is already installed on CSL machines.
+To run it, we need an emulator to emulate a hardware platform (a "fake" machine) for us and then boot xv6 on that emulator. System developers typically use QEMU. QEMU is already installed on CSL machines.
 
 The Makefile has taken care of everything we need to boot it up on QEMU:
 
@@ -81,7 +81,7 @@ $
 
 Use `ctrl-A`, release, then `X` to abort out of QEMU.
 
-### Adding a New System Call
+### Adding a New System Call (Syscall)
 
 **Question**: what do you need to have to implement a system call for a user program to use?
 
@@ -95,7 +95,7 @@ Based on the answer to this question, these are the potential places you need to
     - `user.h`: header of user-level wrappers for user prgrams to include
     - `usys.S`: implementation of user-level wrappers
 
-### Process Control Blocks
+### Process Control Blocks (PCB)
 
 **Question**: if you want to remember information about a process, where should you store that information?
 
@@ -111,7 +111,7 @@ You will need to write a new user program which invokes the new system calls you
 Notes:
 
 - Check out an existing user program, e.g., `echo.c`, to see how to code one.
-- You cannot include C standard libraries - you can only include things that xv6 provides for its user programs. `user.h` contains a list of some of them, where the implementations can be found in `ulib.c`.
+- You cannot include C standard libraries - you can only include things that xv6 provides for its user programs (**Why?**). `user.h` contains a list of some of them, where the implementations can be found in `ulib.c`.
 - You will need to modify the `Makefile` to include your new user program into the building process.
 
 ## Debugging xv6 w/ GDB
