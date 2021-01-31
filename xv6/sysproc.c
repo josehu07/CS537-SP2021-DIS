@@ -90,24 +90,9 @@ sys_uptime(void)
   return xticks;
 }
 
-// (guanzhou) p2
+// (guanzhou) DIS W2
 int
-sys_getnumsyscalls(void)
+sys_getpidplusone(void)
 {
-  int pid;
-
-  if (argint(0, &pid) < 0)
-    return -1;
-  return getnumsyscalls(pid);
-}
-
-// (guanzhou) p2
-int
-sys_getnumsyscallsgood(void)
-{
-  int pid;
-
-  if (argint(0, &pid) < 0)
-    return -1;
-  return getnumsyscallsgood(pid);
+  return myproc()->pid + 1;
 }

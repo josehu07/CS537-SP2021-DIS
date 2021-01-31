@@ -103,9 +103,8 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
-// (guanzhou) p2
-extern int sys_getnumsyscalls(void);
-extern int sys_getnumsyscallsgood(void);
+// (guanzhou) DIS W2
+extern int sys_getpidplusone(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -129,9 +128,8 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-// (guanzhou) p2
-[SYS_getnumsyscalls]      sys_getnumsyscalls,
-[SYS_getnumsyscallsgood]  sys_getnumsyscallsgood,
+// (guanzhou) DIS W2
+[SYS_getpidplusone]      sys_getpidplusone,
 };
 
 void
@@ -143,12 +141,6 @@ syscall(void)
   num = curproc->tf->eax;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     curproc->tf->eax = syscalls[num]();
-    // (guanzhou) p2
-    if (num != SYS_getnumsyscalls && num != SYS_getnumsyscallsgood) {
-      curproc->num_syscalls++;
-      if (curproc->tf->eax != -1)
-        curproc->num_syscalls_good++;
-    }
   } else {
     cprintf("%d %s: unknown sys call %d\n",
             curproc->pid, curproc->name, num);

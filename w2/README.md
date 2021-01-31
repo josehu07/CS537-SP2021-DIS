@@ -128,7 +128,7 @@ The Makefile, again, has taken care of hooking up GDB with xv6 for you:
 
 ```bash
 # In one shell, under xv6 folder:
-$ make qemu-nox-gdb
+[josehu@royal-27] $ make qemu-nox-gdb
 
 Booting from Hard Disk..xv6...
 cpu0: starting 0
@@ -137,9 +137,11 @@ init: starting sh
 $ ls    # Do `ls` after setting up the breakpoint on `exec`
 ```
 
+**NOTE**: QEMU accepts GDB debugging by accepting a local port connection. If you work on CSL machines and logged in the first session with `best-linux`, remember to **explictly log in the second session onto the same machine**!
+
 ```bash
-# In another shell, also in xv6 folder:
-$ gdb
+# Log in the same machine for a second session:
+[josehu@royal-27] $ gdb
 
 (gdb) c     # This will continue the xv6 booting
 Continuing.

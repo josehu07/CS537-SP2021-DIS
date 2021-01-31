@@ -23,9 +23,8 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-// (guanzhou) p2
-int getnumsyscalls(int);
-int getnumsyscallsgood(int);
+// (guanzhou) DIS W2
+int getpidplusone(void);
 
 // ulib.c
 int stat(const char*, struct stat*);

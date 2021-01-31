@@ -30,5 +30,4 @@ SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
 
-SYSCALL(getnumsyscalls)
-SYSCALL(getnumsyscallsgood)
+SYSCALL(getpidplusone)

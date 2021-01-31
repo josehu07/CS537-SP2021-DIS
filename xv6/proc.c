@@ -212,10 +212,6 @@ fork(void)
 
   pid = np->pid;
 
-  // (guanzhou) p2
-  np->num_syscalls = 0;
-  np->num_syscalls_good = 0;
-
   acquire(&ptable.lock);
 
   np->state = RUNNABLE;
@@ -535,28 +531,4 @@ procdump(void)
     }
     cprintf("\n");
   }
-}
-
-// (guanzhou) p2
-int
-getnumsyscalls(int pid)
-{
-  struct proc *p;
-  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-    if (p->pid == pid)
-      return p->num_syscalls;
-  }
-  return -1;
-}
-
-// (guanzhou) p2
-int
-getnumsyscallsgood(int pid)
-{
-  struct proc *p;
-  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-    if (p->pid == pid)
-      return p->num_syscalls_good;
-  }
-  return -1;
 }

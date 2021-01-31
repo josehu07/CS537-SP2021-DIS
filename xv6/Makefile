@@ -167,6 +167,7 @@ mkfs: mkfs.c fs.h
 # http://www.gnu.org/software/make/manual/html_node/Chained-Rules.html
 .PRECIOUS: %.o
 
+# (guanzhou) DIS W2
 UPROGS=\
 	_cat\
 	_echo\
@@ -183,7 +184,7 @@ UPROGS=\
 	_usertests\
 	_wc\
 	_zombie\
-	_syscalls\
+	_testpidplusone\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
