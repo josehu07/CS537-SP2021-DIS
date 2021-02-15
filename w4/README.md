@@ -10,7 +10,7 @@ Topics:
     - Getting arguments w/ `strtok()`
     - Redirection, manipulating file descriptors w/ `dup()` and `dup2()`
     - Aliasing
-- P3 overview
+- P3 overview & Tips
 
 Links:
 
