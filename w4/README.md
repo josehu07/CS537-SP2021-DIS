@@ -65,6 +65,8 @@ The answer could be found [here](https://www.geeksforgeeks.org/fork-practice-que
 
 **Can forked processes communicate over shared memory, e.g., a global static variable?** Processes vs. threads, processes have isolated virtual address space while threads share the same one.
 
+> Maybe interesting to you: copy-on-write optimizations for fork.
+
 ## Understanding `exec()`
 
 The [`exec()` syscall](https://man7.org/linux/man-pages/man3/exec.3.html), or to be more precise, the `execve()` syscall, replaces the current process image with a new one. It essentially executes the target binary executable by replacing the current process's code segment with it.
@@ -79,27 +81,35 @@ The [`exec()` syscall](https://man7.org/linux/man-pages/man3/exec.3.html), or to
 `exec()` is often combined with `fork()` in the following way when the parent process wants to spawn a child process and let it execute a certain executable:
 
 ```C
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
 int main(void) {
     pid_t pid = fork();
 
     if (pid != -1) {
-        if (pid == 0) { // child
+        if (pid == 0) {
+            // child
             printf("child: execing /bin/ls -l\n");
-            
-            char args[3] = {"/bin/ls", "-l", NULL};
+
+            char *args[3] = {"/bin/ls", "-l", NULL};
             execv(args[0], args);
 
             // if child reached here, exec failed
             printf("child: exec failed\n");
             _exit(1);
         
-        } else { // parent
-            waitpid(pid);
+        } else {
+            // parent
+            int status;
+            waitpid(pid, &status, 0);
             printf("parent: child process exits\n");
         }
 
-    } else { // fork failed
-        printf("parent: fork failed")
+    } else {
+        // fork failed
+        printf("parent: fork failed\n");
     }
 
     return 0;
@@ -140,6 +150,7 @@ As you can see, the `simplesh` above is quite primitive. There are some (actuall
 - **Stdout redirection**: when `>` appears in the line followed by a filename, the child process's stdout should be replaced by the file
     - You open the file in the child process, before execing the command
     - On successful file open, you then need to replace the process's stdout fd by the fd of the file; Check out [`dup()` and `dup2()`](https://man7.org/linux/man-pages/man2/dup2.2.html)
+    - In child process, use `_exit` instead of `exit` to avoid closing some file descriptors of the parent
 - **Aliasing**: allow alias names of commands, e.g., `alias ll ls -l` allows you to type `ll` for `ls -l` in the future
     - You will need some kind of data structure to store the current aliasing mappings; Could be just fixed arrays, but linked-lists are better for adding/removing elements
     - If user types `alias` alone, should print a thorough list of all the current aliasing mappings
@@ -151,4 +162,7 @@ We will talk about these in more depth next week.
 
 For P3, the spec is again quite long and informative. Try to read through it and understand it.
 
-**Tip**: in general, start your implementation from a simple, primitive shell. Once that works, **add in features one by one, thoroughly testing each before moving on** to the next feature.
+**Tips**:
+
+- In general, start your implementation from a simple, primitive shell. Once that works, **add in features one by one, thoroughly testing each before moving on** to the next feature.
+- **DO NOT put everything inside a huge `main()` function**. Instead, **break up your shell logic & features into smaller functions**.

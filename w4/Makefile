@@ -7,6 +7,10 @@ SOURCES=$(wildcard *.c)
 TARGETS=$(patsubst %.c,%,${SOURCES})
 
 
+.PHONY: all
+all: ${TARGETS}
+
+
 ${TARGETS}: %:%.c
 	${CC} ${CFLAGS} $< -o $@
 
