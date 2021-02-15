@@ -17,7 +17,7 @@ Links:
 - Remember [cppreference.com](https://en.cppreference.com/w/c) for standard library references
 - Remember the `man` command or [online man pages](https://man7.org/linux/man-pages/man3/exec.3.html) for Linux syscall/utilities references
 
-There are several example program in this repo. Do:
+There are several example programs in this repo. Do:
 
 ```bash
 make
@@ -34,6 +34,8 @@ The [`fork()` syscall](https://man7.org/linux/man-pages/man2/fork.2.html) create
     - What are not duplicated? PID, PPID (parent pid), and a few other things.
 - Returns `0` on the child process; Returns the child's PID on the parent process.
 
+Exampel usage:
+
 ```C
 pid_t retval = fork();
 
@@ -48,7 +50,7 @@ if (pid > 0) {    // -1 means fork failed
 }
 ```
 
-Classic but interesting puzzle about fork: how many processes will be created (including the initial parent) by the following program?
+**Classic but interesting puzzle** about fork: how many processes will be created (including the initial parent) by the following program?
 
 ```C
 int main(void) {
@@ -74,17 +76,16 @@ The [`exec()` syscall](https://man7.org/linux/man-pages/man3/exec.3.html), or to
     - `p` indicates it will search for the target name in all PATH locations; otherwise, must be an absolute path or relative to cwd
     - `e` indicates it takes in an extra list of environment variables that will be fed to the target executable
 
-`exec()` is often combined with `fork()` in the following way:
+`exec()` is often combined with `fork()` in the following way when the parent process wants to spawn a child process and let it execute a certain executable:
 
 ```C
 int main(void) {
     pid_t pid = fork();
 
     if (pid != -1) {
-        if (pid == 0) {
-            // child
+        if (pid == 0) { // child
             printf("child: execing /bin/ls -l\n");
-
+            
             char args[3] = {"/bin/ls", "-l", NULL};
             execv(args[0], args);
 
@@ -92,14 +93,12 @@ int main(void) {
             printf("child: exec failed\n");
             _exit(1);
         
-        } else {
-            // parent
+        } else { // parent
             waitpid(pid);
             printf("parent: child process exits\n");
         }
 
-    } else {
-        // fork failed
+    } else { // fork failed
         printf("parent: fork failed")
     }
 
@@ -131,7 +130,7 @@ simplesh> /bin/ls   # here `simplesh` is executing - type something to feed to i
 
 ## Advanced Features of a Shell
 
-As you can see, the `simplesh` above is quite primitive. There are some (actuall quite a lot of) advanced features not included yet. What you will need to add for P3, based on this skeleton code, include:
+As you can see, the `simplesh` above is quite primitive. There are some (actually quite a lot of) advanced features not included yet. What you will need to add for P3, based on this skeleton code, include:
 
 - **Batch mode** (or *script* mode): Read input lines from a file instead of from stdin
     - This one should be trivial
@@ -139,12 +138,14 @@ As you can see, the `simplesh` above is quite primitive. There are some (actuall
     - You may want to use the [`strtok()`](https://en.cppreference.com/w/c/string/byte/strtok) library function - it is for parsing out "tokens" of a string
     - `strtok()` modifies the string in place, so you might want to do `strdup()` once before to save a copy of the original line, in case you need that later
 - **Stdout redirection**: when `>` appears in the line followed by a filename, the child process's stdout should be replaced by the file
-    - You open the file in the parent process, before forking the child
-    - On successful file read, you then need to replace the child's stdout fd by the fd of the file; Check out [`dup()` and `dup2()`](https://man7.org/linux/man-pages/man2/dup2.2.html)
-- **Aliasing**: allow alias names of commands, e.g., `ll` for `ls -l`
-    - You will need some kind of data structure to store the current aliasing mappings; Could be just arrays, but linked-lists are better for adding/removing elements
+    - You open the file in the child process, before execing the command
+    - On successful file open, you then need to replace the process's stdout fd by the fd of the file; Check out [`dup()` and `dup2()`](https://man7.org/linux/man-pages/man2/dup2.2.html)
+- **Aliasing**: allow alias names of commands, e.g., `alias ll ls -l` allows you to type `ll` for `ls -l` in the future
+    - You will need some kind of data structure to store the current aliasing mappings; Could be just fixed arrays, but linked-lists are better for adding/removing elements
+    - If user types `alias` alone, should print a thorough list of all the current aliasing mappings
+    - Aliases can be removed by doing `unalias aliasname`
 
-We will talk about these techniques in more depth next week.
+We will talk about these in more depth next week.
 
 ## P3 Overview & Tips
 
