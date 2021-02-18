@@ -39,7 +39,7 @@ Exampel usage:
 ```C
 pid_t retval = fork();
 
-if (retval > 0) {    // -1 means fork failed
+if (retval >= 0) {    // -1 means fork failed
     if (retval == 0) {
         // child
         printf("parent PID: %d, child PID: %d\n", getppid(), getpid());
