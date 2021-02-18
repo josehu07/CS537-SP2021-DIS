@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <assert.h>
 #include <sys/wait.h>
 
 
@@ -54,7 +55,8 @@ int main(void) {
 
     while (1) {
         // Use write() to avoid output buffering.
-        write(STDOUT_FILENO, "simplesh> ", 10);
+        ssize_t bytes = write(STDOUT_FILENO, "simplesh> ", 10);
+        assert(bytes > 0);
 
         // Wait for user input line.
         char *ret = fgets(userline, 512, stdin);
