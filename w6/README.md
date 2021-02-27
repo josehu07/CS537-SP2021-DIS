@@ -94,15 +94,15 @@ scheduler(void)
 The CPU **never leaves** this `scheduler()` function! Whenever it gets the chance to pick a user process to run, it `swtch()` to, i.e., context switches to that user process. At some timepoint, the user process will context switch back to this `scheduler()` function.
 
 **When will a user process swtch back to the scheduler?**  There are three cases:
-1. The process exits
-2. The process goes to block voluntarily, examples:
-  1. It calls the sleep syscall
-  2. It calls the wait syscall
-  3. It tries to read on a pipe
-3. The process "yield"s - typically at a timer interrupt
-  1. At every ~10ms, the timer issues a hardware interrupt
-  2. This forces the CPU to trap into the kernel, see `trap()` in `trap.c`
-  3. xv6 then increments a global counter named `ticks`, then `yield()` the current running process
+- The process exits
+- The process goes to block voluntarily, examples:
+  - It calls the sleep syscall
+  - It calls the wait syscall
+  - It tries to read on a pipe
+- The process "yield"s - typically at a timer interrupt
+  - At every ~10ms, the timer issues a hardware interrupt
+  - This forces the CPU to trap into the kernel, see `trap()` in `trap.c`
+  - xv6 then increments a global counter named `ticks`, then `yield()` the current running process
 
 **What is the first user process that gets scheduled on the CPU?**  The `init` process. The `init` then forks a child `sh`, which runs the xv6 shell program. The `init` then waits on `sh`, and the `sh` process will at some timepoint be scheduled -- this is when you see that active xv6 shell prompting you for some input!
 
