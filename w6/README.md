@@ -13,6 +13,8 @@ Links:
 - Scheduler description in the xv6 doc: [Chapter 5](https://pdos.csail.mit.edu/6.828/2018/xv6/book-rev11.pdf)
 - Remzi's discussion section video (old, not the same spec): [scheduler walkthrough](https://www.youtube.com/watch?v=eYfeOT1QYmg)
 
+The most important part of P4 is *understanding* how the default xv6 scheduler works and what are the two features you need to add. You will ONLY need to add/change a few lines of code, but you must get it exactly correct.
+
 ## Scheduling in xv6
 
 Let's just assume a single-core OS. On that CPU core, we have the notion of the current **execution context**, which basically means the current values of the following registers:
@@ -135,7 +137,7 @@ for(;;) {
 }
 ```
 
-Answer: it is a *Round-Robin* (RR) scheduler <u>over the ptable</u>. At a decision point, it always picks the next RUNNABLE process in the ptable order. When it reaches the end of the ptable, it wraps around.
+Answer: it is a *Round-Robin* (RR) scheduler <ins>over the ptable</ins>. At a decision point, it always picks the next RUNNABLE process in the ptable order. When it reaches the end of the ptable, it wraps around.
 
 If we have exactly three RUNNABLE process in the ptable, named A, B, and C, and they happen to appear in the ptable next to each other in that order, then a possible scheduling behavior looks like:
 
@@ -151,7 +153,7 @@ You need to change/add two features to the default primitive RR scheduler:
 1. Allow different processes to have different **timeslice** values - their share of ticks in an RR scheduling cycle
 2. Give **compensation** ticks to a process if it went to sleep previously
 
-Our RR scheduler should operate over some <u>circular queue-like structure</u> (that you need to create), <u>NOT over the ptable</u>. When a new process gets created, it gets added to the *tail* of the queue. Our scheduler loops over that queue.
+Our RR scheduler should operate over some <ins>circular queue-like structure</ins> (that you need to create), <ins>NOT over the ptable</ins>. When a new process gets created, it gets added to the *tail* of the queue. Our scheduler loops over that queue.
 
 With the timeslice feature, different processes can have different timeslice values. Say we have exactly three RUNNABLE process in the ptable, named A, B, and C, created in that order. They have the following timeslice values:
 - A: 4
