@@ -346,6 +346,9 @@ scheduler(void)
       swtch(&(c->scheduler), p->context);
       switchkvm();
 
+      // (guanzhou) DIS W6
+      // cprintf("swtch()'ed back from %d: %s\n", p->pid, p->name);
+
       // Process is done running for now.
       // It should have changed its p->state before coming back.
       c->proc = 0;
