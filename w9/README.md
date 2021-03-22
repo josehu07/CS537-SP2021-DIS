@@ -111,7 +111,7 @@ You already know what is a trap handler, what is a page fault, and what happends
 - The trap handler `trap.c: trap()` has good examples of checking on the trap number and making corresponding reactions
 - Page faults now just fall into the default case
 
-What you need to add:
+What you need to add into `trap.c` for decryption:
 
 - Add a checking on the page fault trapno `T_PGFLT`, check if it is an encrpted page (has `PTE_E` set)
 - If so, it is not an actual page fault - we just decrypt the page and return
