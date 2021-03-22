@@ -82,7 +82,7 @@ To see the definition of a PTE and what each bit means, see `mmu.h`.
 
 +---------------20----------------+---------12----------+
 |      Physical page number       |       Flags         |
-+----------------+----------------+---------------------+
++---------------------------------+---------------------+
 
 #define PTE_P           0x001   // Present
 #define PTE_W           0x002   // Writeable
@@ -91,7 +91,7 @@ To see the definition of a PTE and what each bit means, see `mmu.h`.
 
 Page size (so physical frame size as well) in xv6 is <ins>4KB</ins>.
 
-**Quiz time: I have a user virtual address `uva1 = 0x00123000`. Walking the page table gives me `walkpgdir(myproc(), uva1) -> pte == 0x00A71007 == 0000 0000 1010 0111 0001 0000 0000 0111`.
+**Quiz time: I have a user virtual address `uva1 = 0x00123000`. Walking the page table gives me `walkpgdir(myproc(), uva1) -> pte == 0x00A71007 == 0000 0000 1010 0111 0001 0000 0000 0111`.**
 
 - What is `PGROUNDDOWN(uva1)`?
 - Is this page present?
