@@ -11,8 +11,8 @@ Topics:
         - Physical address (pa)
         - Kernel address (ka)
     - Two-level page table
-- Page fault trap mechanism
 - P5 (part A) overview & tips
+- Page fault trap mechanism
 
 Links:
 
@@ -54,6 +54,7 @@ xv6 has a bunch of utilities for translation:
 - uva to pa: **Question: who carries out this translation?**
 - pa to uva: not necessary
 - uva to ka: `uva2ka()`, combines uva-to-pa with pa-to-ka
+- Rounding down an address to the page start: `PGROUNDDOWN()`
 
 **Answer to above question**: the page table of current process. See the `vm.c: walkpgdir()`. The entire page table is in memory, but may be cached by the CPU (recall TLBs), so after you modify anything in a page table entry, do `switchuvm(myproc())` to force a reload.
 
@@ -98,10 +99,22 @@ Page size (so physical frame size as well) in xv6 is <ins>4KB</ins>.
 - Is this page accessible to the user?
 - What is the physical address of the user virtual address `uva2 = 0x00123050`?
 
-## Page Fault Trap Mechanism
-
-
-
 ## P5 (Part A) Overview
 
+The spec is pretty straight-forward. The only tricky thing here is that set the encrypted bit `PTE_E` and we clear the present bit `PTE_P` in order to trigger a page fault later, where we do decryption.
 
+## Page Fault Trap Mechanism
+
+You already know what is a trap handler, what is a page fault, and what happends when the hardware meets a page fault. Some information you may find useful for this project:
+
+- Trap numbers are defined as macros in `trap.h`
+- The trap handler `trap.c: trap()` has good examples of checking on the trap number and making corresponding reactions
+- Page faults now just fall into the default case
+
+What you need to add:
+
+- Add a checking on the page fault trapno `T_PGFLT`, check if it is an encrpted page (has `PTE_E` set)
+- If so, it is not an actual page fault - we just decrypt the page and return
+    - You can get the faulty address by `rcr2()`
+    - Remember to clear the `PTE_E` bit and set the `PTE_P` bit back so later accesses to the page are no longer faults
+- If not, it is an actual page fault - let it fall into the default case
