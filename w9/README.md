@@ -107,7 +107,7 @@ The spec is pretty straight-forward. The only tricky thing here is that set the 
 
 You already know what is a trap handler, what is a page fault, and what happends when the hardware meets a page fault. Some information you may find useful for this project:
 
-- Trap numbers are defined as macros in `trap.h`
+- Trap numbers are defined as macros in `traps.h`
 - The trap handler `trap.c: trap()` has good examples of checking on the trap number and making corresponding reactions
 - Page faults now just fall into the default case
 
