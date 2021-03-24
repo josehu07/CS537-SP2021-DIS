@@ -92,11 +92,12 @@ To see the definition of a PTE and what each bit means, see `mmu.h`.
 
 Page size (so physical frame size as well) in xv6 is <ins>4KB</ins>.
 
-**Quiz time: I have a user virtual address `uva1 = 0x00123000`. Walking the page table gives me `walkpgdir(myproc(), uva1) -> pte == 0x00A71007 == 0000 0000 1010 0111 0001 0000 0000 0111`.**
+**Quiz time: I have a user virtual address `uva1 = 0x00123000`. Walking the page table gives me `walkpgdir(myproc(), uva1) -> pte1 == 0x00A71007 == 0000 0000 1010 0111 0001 0000 0000 0111`.**
 
 - What is `PGROUNDDOWN(uva1)`?
 - Is this page present?
 - Is this page accessible to the user?
+- What is the physical address of this page (that is, what is `PTE_ADDR(pte1)`)?
 - What is the physical address of the user virtual address `uva2 = 0x00123050`?
 
 ## P5 (Part A) Overview
