@@ -103,6 +103,14 @@ Page size (so physical frame size as well) in xv6 is <ins>4KB</ins>.
 
 The spec is pretty straight-forward. The only tricky thing here is that set the encrypted bit `PTE_E` and we clear the present bit `PTE_P` in order to trigger a page fault later, where we do decryption.
 
+Files you will need to change:
+
+- Adding new syscalls - you are an expert at it
+    - Except that this time, internal handlers go in `vm.c`, not `proc.c`
+- In `vm.c`, handlers for `mencrypt()` ※, `getpgtable()`, and `dump_rawphymem()`
+- In `vm.c`, `mdecrypt()` - this is not a syscall handler, but will be used by the trap handler for implicit decryption
+- In `trap.c: trap()`, handle the `T_PGFLT` case where `PTE_E` is set
+
 ## Page Fault Trap Mechanism
 
 You already know what is a trap handler, what is a page fault, and what happends when the hardware meets a page fault. Some information you may find useful for this project:
