@@ -35,7 +35,7 @@ pte_t *pte = ...;   // a pointer to a PTE, so *pte is the PTE content
 *pte = (*pte) | PTE_P;      // set PTE_P bit
 *pte = (*pte) & (~PTE_P);   // clear PTE_P bit
 if ((*pte) & PTE_P) {...};  // test PTE_P bit is set
-    ```
+```
 
 How to capture a page fault in the trap handler?
 
