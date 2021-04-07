@@ -110,6 +110,44 @@ clk_insert(int vpn, pte_t *pte)
     *(clk_queue[clk_hand].pte) |= PTE_R;
 }
 
+// Removing a page forcefully is tricky because you need to
+// shift things around.
+// This happens at page deallocation.
+static void
+clk_remove(int vpn)
+{
+    int prev_tail = clk_hand;
+    int match_idx = -1;
+
+    // Search for the matching element.
+    for (int i = 0; i < CLOCKSIZE; ++i) {
+        int idx = (clk_hand + i) % CLOCKSIZE;
+        if (clk_queue[idx].vpn == vpn) {
+            match_idx = idx;
+            break;
+        }
+    }
+
+    if (match_idx == -1)
+        return;
+
+    // Shift everything from match_idx+1 to prev_tail to
+    // one slot to the left.
+    for (int idx = match_idx;
+         idx != prev_tail;
+         idx = (idx + 1) % CLOCKSIZE) {
+        int next_idx = (idx + 1) % CLOCKSIZE;
+        clk_queue[idx].vpn = clk_queue[next_idx].vpn;
+        clk_queue[idx].pte = clk_queue[next_idx].pte;
+    }
+
+    // Clear the element at prev_tail. Set clk_hand to
+    // one entry to the left.
+    clk_queue[prev_tail].vpn = -1;
+    clk_hand = clk_hand == 0 ? CLOCKSIZE - 1
+                             : clk_hand - 1;
+}
+
 // Initialize the clock queue to an empty state.
 static void
 clk_clear(void)
@@ -148,6 +186,15 @@ do_ref_page(int vpn, pte_t *pte)
     if (clk_search(vpn) != NULL)
         return;
     clk_insert(vpn, pte);
+}
+
+// Removing a page gets tricky and may involve shifting things
+// in the queue.
+static void
+do_remove_page(int vpn)
+{
+    printf("Remove page %1X\n", vpn);
+    clk_remove(vpn);
 }
 
 
@@ -199,6 +246,11 @@ main(void) {
     clk_print();
 
     do_ref_page(11, &pgtable[11]);
+    wait_for_enter();
+    clk_print();
+
+    do_remove_page(10);
+    do_remove_page(11);
     wait_for_enter();
     clk_print();
 }

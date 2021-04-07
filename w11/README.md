@@ -15,13 +15,12 @@ Links:
 
 The **CLOCK alagorithm == "second-chance" FIFO**. It behaves like a FIFO, but when trying to evict a page, we give a page a second chance if it was referenced recently (has ref bit set). In this case, we clear its ref bit and move on to the next one. If all pages in queue were recently referenced, then we eventually loop back to the first page we examined (it now has ref bit cleared) so we still pick it.
 
-There are many ways to implement the CLOCK algorithm:
+There are two ways to implement the CLOCK algorithm:
 
-- As a linked list FIFO (*hard in xv6 kernel*)
-- As a fixed ring buffer, but shifting things around to make it behave like a FIFO (*not very efficient*)
-- As a fixed ring buffer + a **clock hand** index pointing to the current tail (*classic impl, recommended*)
+- As a linked list FIFO, as shown in the spec (*hard to write in xv6 kernel, but easy to do page removal*)
+- As a fixed ring buffer + a clock hand index pointing to the current tail (*easy to write in xv6 kernel, but hard to do page removal*)
 
-Feel free to choose whichever way you think the most convenient for you. I will show you an implementation with the third option, which is how most CLOCK algorithms get implemented in cache eviction systems.
+Feel free to choose whichever way you think the most convenient for you. I will show you an implementation with the second option, which is how most CLOCK algorithms get implemented in cache eviction systems.
 
 Be sure to try out the `clock-example` user-level implementation:
 
