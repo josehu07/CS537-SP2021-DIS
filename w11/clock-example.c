@@ -7,8 +7,8 @@
 #define CLOCKSIZE 8
 
 #define PTE_P 0x001
+#define PTE_A 0x020
 #define PTE_E 0x200
-#define PTE_R 0x400
 
 typedef uint32_t pte_t;
 
@@ -54,26 +54,8 @@ mdecrypt(int vpn, pte_t *pte)
 // Clock queue operations //
 ////////////////////////////
 
-// Search for a page without changing the hand position.
-// This is the first thing you do when you try to ref a page.
-static node_t *
-clk_search(int vpn)
-{
-    for (int i = 0; i < CLOCKSIZE; ++i) {
-        if (clk_queue[i].vpn == vpn) {
-            // Ref the page and return;
-            *(clk_queue[i].pte) |= PTE_R;
-            *(clk_queue[i].pte) |= PTE_P;
-            return &clk_queue[i];
-        }
-    }
-    return NULL;
-}
-
 // Insert a page (should be guaranteed not already in queue)
 // into the clock queue.
-// This is the second thing you do when you try to ref a page
-// and find that it is not in queue (so encrypted).
 static void
 clk_insert(int vpn, pte_t *pte)
 {
@@ -89,26 +71,22 @@ clk_insert(int vpn, pte_t *pte)
         
         // Else if the page in this slot does not have its ref
         // bit set, evict this one.
-        } else if (!(*(clk_queue[clk_hand].pte) & PTE_R)) {
+        } else if (!(*(clk_queue[clk_hand].pte) & PTE_A)) {
             // Encrypt the evicted page.
-            mencrypt(vpn, pte);
+            mencrypt(clk_queue[clk_hand].vpn, clk_queue[clk_hand].pte);
             // Put in the new page.
             clk_queue[clk_hand].vpn = vpn;
             clk_queue[clk_hand].pte = pte;
             break;
 
         // Else, clear the ref bit of the page in slot.
-        // This should be accompanied by clearing the present
-        // bit as well.
         } else {
-            *(clk_queue[clk_hand].pte) &= (~PTE_R);
-            *(clk_queue[clk_hand].pte) &= (~PTE_P);
+            *(clk_queue[clk_hand].pte) &= (~PTE_A);
         }
     }
 
-    // Decrypt the new page and set reference bit.
+    // Decrypt the new page.
     mdecrypt(vpn, pte);
-    *(clk_queue[clk_hand].pte) |= PTE_R;
 }
 
 // Removing a page forcefully is tricky because you need to
@@ -170,23 +148,28 @@ clk_print(void)
         if (clk_queue[print_idx].vpn != -1) {
             printf("VPN %1X R %1d | ",
                 clk_queue[print_idx].vpn,
-                (*(clk_queue[print_idx].pte) & PTE_R) > 0);
+                (*(clk_queue[print_idx].pte) & PTE_A) > 0);
         }
     }
     printf("\n\n");
 }
 
 
-// Now, referencing a page (that triggered a page falt) means:
-//   1. Search for the page clock queue
-//   2. If not found - insert this page, possibly evicting another
+// Now, referencing a page (that triggered a page falt) means
+// inserting this page into the clock queue, possibly evicting
+// another.
 static void
 do_ref_page(int vpn, pte_t *pte)
 {
     printf("Ref page %1X\n", vpn);
-    if (clk_search(vpn) != NULL)
-        return;
+
+    if (*pte & PTE_P) {
+        *pte |= PTE_A;  // mimick the HW setting ref bit
+        return;     // if has PTE_P, hardware won't trigger page fault
+    }
+    
     clk_insert(vpn, pte);
+    *pte |= PTE_A;  // mimick the HW setting ref bit
 }
 
 // Removing a page gets tricky and may involve shifting things
@@ -210,8 +193,8 @@ int
 main(void) {
     // Mimick a pgtable.
     // I omitted the physical frame number in the PTEs.
-    // A page starts with PTE_E set (encrypted), and
-    // PTE_P and PTE_R are not set.
+    // A page starts with PTE_E set (encrypted), and so
+    // PTE_P is not set.
     pte_t pgtable[12] = {0};
     for (int i = 0; i < 12; ++i)
         pgtable[i] |= PTE_E;

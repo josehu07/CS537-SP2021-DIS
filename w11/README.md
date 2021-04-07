@@ -31,17 +31,30 @@ $ ./clock-example
 
 Go through the code of `clock-example.c`...
 
-## P6 Overview & Tips
-
-P6 spec has not yet been finalized, so please expect small changes. Nonetheless, the CLOCK algorithm will be used so it is a good time to start making a CLOCK implementation.
-
-Be sure to get a user-level CLOCK algorithm working before trying anything in kernel!
+## Putting the Clock into xv6 Kernel
 
 Think about the following questions:
 - What should the **initial state of pages** of a process be?  **Answer: all encrypted.**
 - What happens when you **access a page**?  **Answer:**
   - if the page has `PTE_P` set, then nothing happens, no faults; the page must be in queue and in clear text
-  - if there is a fault but the page is actually in queue, this happens for a page with cleared `PTE_R` bit
   - if there is a fault and the page cannot be found in queue, this is an encrypted page and needs to be inserted into the clock queue, possibly evicting another page
-- What **happens on `fork()`**?  Answer: child copies the exact clock queue of its parent.
-- What **happens on `exec()`**?  Answer: needs to be treated specially! Will be covered in later discussion sections.
+- What **happens on `fork()`**?  **Answer: child copies the exact clock queue of its parent.**
+
+These two places need to be changed as well for P6 (which were not needed in P5):
+- What **happens on `exec()`**?  **Answer: clear the clock queue, encrypt all the pages.**
+- What **happens on `proc.c: growproc()`**?  **Answer**:
+  - if growing (due to, say, `sbrk()`), encrypt all the newly allocated pages
+  - if shrinking (deallocating pages), need to remove all those pages from the clock queue
+
+Hardware access bit `PTE_A`:
+- Please use the hardware `PTE_A` bit - it will greatly simplify the reference bit handling
+- `PTE_A == 0x020` is supported by x86 hardware, but xv6 currently is not using it; add a macro definition in `mmu.h`
+- Hardware automatically sets this bit when referencing a page; we only clear this bit in the clock algorithm
+
+## P6 Overview & Tips
+
+P6 spec has not yet been finalized, so please expect small changes. Nonetheless, the CLOCK algorithm will be used so it is a good time to start making a CLOCK implementation.
+
+Tips:
+- Be sure to get a user-level CLOCK algorithm working before trying anything in kernel!
+- Understand where in xv6 kernel you encrypt/decrypt pages: see the above section. Implementing a CLOCK is straight-forward (if you have a working user-level implementation). Figuring out when to encrypt/decrypt pages and when to interact with the clock is trickier.
