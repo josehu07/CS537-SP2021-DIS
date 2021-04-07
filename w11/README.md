@@ -9,11 +9,11 @@ Topics:
 
 Links:
 
-- Be sure to fully understand this [user-level CLOCK impl]() before trying anything in kernel
+- Be sure to fully understand this [user-level CLOCK impl](https://github.com/josehu07/CS537-SP2021-DIS/blob/main/w11/clock-example.c) before trying anything in kernel
 
 ## CLOCK Algorithm
 
-The **CLOCK alagorithm == A "second-chance" FIFO**. It behaves like a FIFO, but when trying to evict a page, we give a page a second chance if it was referenced recently (has ref bit set). In this case, we clear its ref bit and move on to the next one. If all pages in queue were recently referenced, then we eventually loop back to the first page we examined (it now has ref bit cleared) so we still pick it.
+The **CLOCK alagorithm == "second-chance" FIFO**. It behaves like a FIFO, but when trying to evict a page, we give a page a second chance if it was referenced recently (has ref bit set). In this case, we clear its ref bit and move on to the next one. If all pages in queue were recently referenced, then we eventually loop back to the first page we examined (it now has ref bit cleared) so we still pick it.
 
 There are many ways to implement the CLOCK algorithm:
 
@@ -34,13 +34,15 @@ Go through the code of `clock-example.c`...
 
 ## P6 Overview & Tips
 
-Please see the P6 spec.
+P6 spec has not yet been finalized, so please expect small changes. Nonetheless, the CLOCK algorithm will be used so it is a good time to start making a CLOCK implementation.
 
 Be sure to get a user-level CLOCK algorithm working before trying anything in kernel!
 
 Think about the following questions:
-- What should the **initial state of pages** of a process be?  Answer: all encrypted.
-- What happens when you **access a page**?  Answer:
-  - if the page is in-queue and has PTE_P set, then nothing happens, no faults
-  - if there is a fault but the page is actually in queue, this happens for a page with cleared PTE_R bit
+- What should the **initial state of pages** of a process be?  **Answer: all encrypted.**
+- What happens when you **access a page**?  **Answer:**
+  - if the page has `PTE_P` set, then nothing happens, no faults; the page must be in queue and in clear text
+  - if there is a fault but the page is actually in queue, this happens for a page with cleared `PTE_R` bit
   - if there is a fault and the page cannot be found in queue, this is an encrypted page and needs to be inserted into the clock queue, possibly evicting another page
+- What **happens on `fork()`**?  Answer: child copies the exact clock queue of its parent.
+- What **happens on `exec()`**?  Answer: needs to be treated specially! Will be covered in later discussion sections.
