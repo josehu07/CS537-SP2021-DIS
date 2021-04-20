@@ -81,4 +81,4 @@ I pretty covered everything about P7 in the above four sections.
 
 Tips:
 - Split into two parts - multi-threading and shared memory, they are quite orthogonal.
-- All basic user-level programming! Not anything in kernel, should be easier to do than P4-P6.
+- All basic user-level programming! Nothing in kernel, should be easier to do than P4-P6.

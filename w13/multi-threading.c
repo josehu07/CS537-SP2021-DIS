@@ -5,10 +5,16 @@
 #define THREAD_CNT 5
 
 
-static void
-worker_func(void) {
-    printf("Hello from worker %d\n", pthread_self());
-    return;
+static void *
+worker_func(void *arg) {
+    printf("Hello from worker %lu\n", pthread_self());
+        // NOTE: on different platforms, pthread_self()
+        // might return different things. I know that on
+        // Macintosh it returns a pointer to a structure
+        // describing the thread. On UNIX it returns a
+        // long unsigned int.
+
+    return NULL;
 }
 
 
