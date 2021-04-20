@@ -5,7 +5,7 @@ Copyright 2021 Guanzhou Hu
 Topics:
 
 - Web server architecture
-- Multihreading w/ `pthread`
+- Multi-threading w/ `pthread`
 - Shared memory w/ `shm`
 - Signal handler
 - P7 overview & tips
@@ -35,7 +35,7 @@ For this project, we have requirements on the multi-threading model:
 - **Fixed-size thread pool** created beforehand
     - Main thread creates a fixed number of children threads
     - Then, main thread goes into an infinite loop of accepting client requests, get connection `connfd`
-    - Worker threads just do an infinite loop of grabing `connfd` from the buffer, handling the request, and closing the connection
+    - Worker threads just do an infinite loop of grabbing `connfd` from the buffer, handling the request, and closing the connection
 - **Fixed-size, static work buffer**
     - Main thread puts `connfd` into the buffer, if there is any empty slot
     - Worker thread fetches `connfd` from the buffer, if buffer is not empty
@@ -43,7 +43,7 @@ For this project, we have requirements on the multi-threading model:
 
 This is exactly a producer-consumer model! We just have multiple consumers.
 
-**Question: How many condition variables do we need** to synchronize the accesses on the work bufferr?
+**Question: How many condition variables do we need** to synchronize the accesses on the work buffer?
 
 **Answer:** we need two: `buf_not_full` and `buf_not_empty`.
 
@@ -73,7 +73,7 @@ However, we want some extra work to be done at termination. **Question: What ext
 
 So, we need a user-defined signal handler, and "register" it with SIGINT. Then, when the process receives SIGINT, it calls back this handler function.
 
-See `signal-handler.c` for examples of registering a signal hanlder using `signal()`.
+See `signal-handler.c` for examples of registering a signal handler using `signal()`.
 
 ## P7 Overview & Tips
 
